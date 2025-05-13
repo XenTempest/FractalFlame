@@ -5,4 +5,4 @@ For more information regarding fractal flames, visit the [wikipedia page](https:
 
 Special thanks to H Hays ([Elkwizard](https://www.github.com/Elkwizard)) for their help with some of the math and the general notions.
 
-Try it [here](xentempest.github.io/FractalFlame/FractalFlame.html)!
+Try it [here](https://xentempest.github.io/FractalFlame/FractalFlame.html)!
