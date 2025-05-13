@@ -4,3 +4,5 @@ An iterated function system which applies non-linear functions to randomly gener
 For more information regarding fractal flames, visit the [wikipedia page](https://en.wikipedia.org/wiki/Fractal_flame).
 
 Special thanks to H Hays ([Elkwizard](https://www.github.com/Elkwizard)) for their help with some of the math and the general notions.
+
+Try it [here](xentempest.github.io/FractalFlame/FractalFlame.html)!
