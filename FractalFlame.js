@@ -43,12 +43,17 @@ function toScreenSpace(p) {
     const sharpened = p.scale(Math.min(canvas.width, canvas.height) / 2).add(center);
     return new Vector2D(Math.round(sharpened.x), Math.round(sharpened.y));
 }
+function resetPoint(point){
+    point.vector = make2DVec(sinRandom(), sinRandom());
+}
 let points = [];
 for (let i = 0; i < 100; i++) {
     points.push({
         vector: is3D ? new Vector3D(0, 0, 0) : new Vector2D(0, 0),
         color: new Color(0, 0, 0, 1)
     });
+    resetPoint(points[i]);
+    console.log(points[i].vector)
 }
 function sinRandom() {
     return Math.random() * 2 - 1;
@@ -92,9 +97,9 @@ function make2DVec(x, y) {
 let time = 0;
 let stepOpts = [
     // (p) => p.scale(0.5).add(new Vector3D(0, -0.36, 0)),
-    //(p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5)),
-    //(p) => p.scale(0.5).add(new Vector3D (0.5, 0.5, -0.5)),
-    //(p) => p.scale(0.5).add(new Vector3D (0, 0.5, 0.36)),
+    // (p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5)),
+    // (p) => p.scale(0.5).add(new Vector3D (0.5, 0.5, -0.5)),
+    // //(p) => p.scale(0.5).add(new Vector3D (0, 0.5, 0.36)),
     // (p) => p.scale(0.5).add(make2DVec(0, 0.2)),
     //(p) => p.scale(0.5).add(make2DVec(-2, -0.5)),
     //(p) => p.scale(0.5).add(make2DVec(2, -0.5)),
@@ -104,7 +109,24 @@ let stepOpts = [
     // matrixFn(new Matrix(-0.15, 0.28, 0, 0.26, 0.24, 0.44)),
     randomMatrixFn(),
     randomMatrixFn(),
-    randomMatrixFn(),
+    // randomMatrixFn(),
+    (p) => {
+        let r = p.length();
+        let cos = Math.cos(r**2);
+        let sin = Math.sin(r**2);
+        return make2DVec(p.x * sin - p.y * cos, p.x * cos + p.y * sin);
+    },
+    //p => p.scale(1/(p.length()**2)),
+    // (p) => {
+    //     let r = p.length();
+    //     return make2DVec((p.x - p.y)*(p.x + p.y), 2 * (p.x * p.y)).scale(1/r);
+    // },
+    p => { 
+        const {x, y} = p;
+        const c = 2;
+        const f = .8; 
+        return make2DVec(x + c*Math.sin(Math.tan(3 * y)), y + f*Math.sin(Math.tan(3 * x)));
+    },
     toStep(x => Math.sqrt(Math.abs(x))),
     //toStep(x => Math.cos(Math.cos(1/x**(Math.round(Math.random()*2))))),
     //toStep(x => Math.cos(x)/Math.sin(x)) 
@@ -119,6 +141,7 @@ const stepColors = new Map();
 for (let i = 0; i < stepOpts.length; i++) {
     stepColors.set(stepOpts[i], randColor());
 }
+
 function animate() {
     const imageData = brush.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 1000; i++) {
@@ -133,7 +156,7 @@ function animate() {
             const screenPoint = toScreenSpace(point.vector);
 
             if ((screenPoint.x < canvas.width && screenPoint.x > 0)
-                && (screenPoint.y < canvas.height && screenPoint.y > 0)) {
+                && (screenPoint.y < canvas.height && screenPoint.y > 0) && i > 20) {
                 const pixelChunk = (screenPoint.x + canvas.width * screenPoint.y) * 4;
                 const alpha = point.color.a;
                 imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
@@ -146,7 +169,7 @@ function animate() {
     }
     for (let i = 0; i < 10; i++) {
         const j = Math.floor(Math.random() * points.length);
-        points[j].vector = make2DVec(0, 0);
+        resetPoint(points[j]);
     }
     requestAnimationFrame(animate);
     brush.putImageData(imageData, 0, 0);
