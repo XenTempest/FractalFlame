@@ -1,4 +1,4 @@
-const is3D = false;
+
 class Color {
     constructor(r, g, b, a = 1) {
         this.r = r;
@@ -28,7 +28,7 @@ function choose(f, p) {
     let r = Math.random();
     let sum = 0;
     for (let i = 0; i < f.length; i++) {
-        sum += p[i];
+        sum += p.get(f[i]);
         if (r < sum) {
             return f[i];
         }
@@ -43,7 +43,7 @@ function toScreenSpace(p) {
     const sharpened = p.scale(Math.min(canvas.width, canvas.height) / 2).add(center);
     return new Vector2D(Math.round(sharpened.x), Math.round(sharpened.y));
 }
-function resetPoint(point){
+function resetPoint(point) {
     point.vector = make2DVec(sinRandom(), sinRandom());
 }
 let points = [];
@@ -53,7 +53,6 @@ for (let i = 0; i < 100; i++) {
         color: new Color(0, 0, 0, 1)
     });
     resetPoint(points[i]);
-    console.log(points[i].vector)
 }
 function sinRandom() {
     return Math.random() * 2 - 1;
@@ -64,6 +63,7 @@ function randomMatrix() {
     }
     return new Matrix2D(sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom());
 }
+let randomMatrices = 2; 
 function randomMatrixFn() {
     return matrixFn(randomMatrix());
 }
@@ -78,16 +78,14 @@ function lerp(a, b, t) {
 }
 function normalizeDistribution(d) {
     let sum = 0;
-    for (let i = 0; i < d.length; i++) {
-        sum += d[i];
+    for (let value of d.values()) {
+        sum += value;
     }
-    for (let i = 0; i < d.length; i++) {
-        d[i] /= sum;
+    for (let key of d.keys()) {
+        d.set(key, d.get(key)/sum);
     }
 }
-function toStep(f) {
-    return is3D ? (p) => new Vector3D(f(p.x), f(p.y), f(p.z)) : (p) => new Vector2D(f(p.x), f(p.y));
-}
+
 function randColor() {
     return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, .1);
 }
@@ -95,51 +93,63 @@ function make2DVec(x, y) {
     return is3D ? new Vector3D(x, y, 0) : new Vector2D(x, y);
 }
 let time = 0;
-let stepOpts = [
-    // (p) => p.scale(0.5).add(new Vector3D(0, -0.36, 0)),
-    // (p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5)),
-    // (p) => p.scale(0.5).add(new Vector3D (0.5, 0.5, -0.5)),
-    // //(p) => p.scale(0.5).add(new Vector3D (0, 0.5, 0.36)),
-    // (p) => p.scale(0.5).add(make2DVec(0, 0.2)),
-    //(p) => p.scale(0.5).add(make2DVec(-2, -0.5)),
-    //(p) => p.scale(0.5).add(make2DVec(2, -0.5)),
-    //matrixFn(new Matrix(0, 0, 0, 0, 0.16, 0)),
-    //  matrixFn(new Matrix(0.85, 0.04, 0, -0.04, 0.85, 1.60)),
-    //  matrixFn(new Matrix(0.2, -0.26, 0, 0.23, 0.22, 1.6)),
-    // matrixFn(new Matrix(-0.15, 0.28, 0, 0.26, 0.24, 0.44)),
-    randomMatrixFn(),
-    randomMatrixFn(),
-    // randomMatrixFn(),
-    (p) => {
-        let r = p.length();
-        let cos = Math.cos(r**2);
-        let sin = Math.sin(r**2);
-        return make2DVec(p.x * sin - p.y * cos, p.x * cos + p.y * sin);
-    },
-    //p => p.scale(1/(p.length()**2)),
-    // (p) => {
-    //     let r = p.length();
-    //     return make2DVec((p.x - p.y)*(p.x + p.y), 2 * (p.x * p.y)).scale(1/r);
-    // },
-    p => { 
-        const {x, y} = p;
-        const c = 2;
-        const f = .8; 
-        return make2DVec(x + c*Math.sin(Math.tan(3 * y)), y + f*Math.sin(Math.tan(3 * x)));
-    },
-    toStep(x => Math.sqrt(Math.abs(x))),
-    //toStep(x => Math.cos(Math.cos(1/x**(Math.round(Math.random()*2))))),
-    //toStep(x => Math.cos(x)/Math.sin(x)) 
-];
-
-const stepProbs = [];
-while (stepProbs.length < stepOpts.length) {
-    stepProbs.push(Math.random() * 1000);
+let matrices = [];
+function randMatrices(){
+    matrices =[];
+    for(let i = 0; i < randomMatrices; i++){
+        matrices.push(randomMatrixFn());
+    }
 }
-normalizeDistribution(stepProbs);
+function clownToClownCommunicate(a, m, f){
+    for (let key of m.keys()){
+        if (!a.includes(key)){
+            m.delete(key);
+        }
+    }
+    for (let key of a){
+        if(!m.has(key)){
+            m.set(key, f());
+        }
+    }
+}
+let stepOpts;
+function submitChanges(){
+    stepOpts = [];
+    for (let i = 0; i < nonLinearFunctions.length; i++){
+        if (nonLinearFunctions[i].isActive){
+            stepOpts.push(nonLinearFunctions[i].implementation);
+        }
+    }
+    if (randomMatrices !== matrices.length){
+        randMatrices();
+    }
+    stepOpts.push(...matrices);
+    clownToClownCommunicate(stepOpts, stepProbs, Math.random);
+    clownToClownCommunicate(stepOpts, stepColors, randColor);
+    normalizeDistribution(stepProbs);
+    refresh();
+}
+function refresh(){
+    for (let i = 0; i < points.length; i++){
+        resetPoint(points[i]);
+    }
+    brush.clearRect(0, 0, canvas.width, canvas.height);
+}
+let stepProbs = new Map();
+function randWeights() {
+    stepProbs.clear();
+    for (let i = 0; i < stepOpts.length; i++) {
+        stepProbs.set(stepOpts[i], Math.random());
+    }
+    normalizeDistribution(stepProbs);
+}
+
 const stepColors = new Map();
-for (let i = 0; i < stepOpts.length; i++) {
-    stepColors.set(stepOpts[i], randColor());
+function randColors() {
+    stepColors.clear();
+    for (let i = 0; i < stepOpts.length; i++) {
+        stepColors.set(stepOpts[i], randColor());
+    }
 }
 
 function animate() {
@@ -174,4 +184,5 @@ function animate() {
     requestAnimationFrame(animate);
     brush.putImageData(imageData, 0, 0);
 }
+submitChanges();
 animate();
