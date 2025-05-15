@@ -44,7 +44,7 @@ function toScreenSpace(p) {
     return new Vector2D(Math.round(sharpened.x), Math.round(sharpened.y));
 }
 function resetPoint(point) {
-    point.vector = make2DVec(sinRandom(), sinRandom());
+    point.vector = is3D ? new Vector3D(sinRandom(), sinRandom(), sinRandom()) : new Vector2D(sinRandom(), sinRandom());
 }
 let points = [];
 for (let i = 0; i < 100; i++) {
@@ -99,6 +99,7 @@ function randMatrices(){
     for(let i = 0; i < randomMatrices; i++){
         matrices.push(randomMatrixFn());
     }
+    submitChanges();
 }
 function clownToClownCommunicate(a, m, f){
     for (let key of m.keys()){
@@ -142,6 +143,7 @@ function randWeights() {
         stepProbs.set(stepOpts[i], Math.random());
     }
     normalizeDistribution(stepProbs);
+    submitChanges();
 }
 
 const stepColors = new Map();
@@ -150,6 +152,7 @@ function randColors() {
     for (let i = 0; i < stepOpts.length; i++) {
         stepColors.set(stepOpts[i], randColor());
     }
+    submitChanges();
 }
 
 function animate() {

@@ -1,0 +1,158 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: black;
+    color: white;
+    overflow: hidden
+}
+
+canvas {
+    width: 100vw;
+    height: 100vh;
+}
+#menu{
+    position: absolute; 
+    right: 0;
+    top: 0;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    border-left: 2px white solid;
+    height: 100vh;
+    width: 30ch;
+    gap: 0.4em;
+    font-family: 'Arial';
+    font-size: 1em;
+    align-items: center;
+}
+#toggleMenu{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50px;
+    height: 50px;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 50%; 
+}
+#toggleMenu:hover{
+    opacity: 1;
+}
+.hidden{
+    display: none !important;
+}
+#toggleMenu span{
+    left:50%;
+    top: 50%;
+    transform: translate(-50%, -54%); 
+    position:absolute;
+    font-size: 40px; 
+}
+input[type="checkbox"] {
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    padding: 0;
+    background: black;
+    border: 1px white solid;
+    position: relative;
+    top: 1px;
+    font-size: inherit !important; 
+
+    /* &:checked {
+background: white;
+} */
+
+    &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(0);
+        width: calc(100% - 2px);
+        aspect-ratio: 1/1;
+        transition: transform 0.3s;
+    }
+
+    &:checked::before {
+        transform: translate(-50%, -50%) rotate(180deg);
+        background: white;
+    }
+}
+
+input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 10em;
+    height: 1em;
+    background: black;
+    border: 1px white solid;
+    display: inline-block;
+    position: relative;
+    top: 1px;
+
+    &::-webkit-slider-thumb {
+        appearance: none;
+        width: 1em;
+        height: 1em;
+        display: block;
+        background: white;
+        border: 1px white solid;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+    }
+}
+
+button {
+    border: 1px white solid;
+    background: black;
+    color: white;
+    font-family: inherit !important;
+    font-size: inherit !important; 
+    padding: 0.2em 0.5em;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    &:active {
+        background: white;
+        color: black;
+    }
+}
+#menu button {
+    width: 100%;
+}
+#menu div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width:100%;
+}
+#randomMatrices{
+    width: 5ch; 
+    display: inline-block;
+}
+#functionList{
+    flex-direction: column !important;
+    gap: 0.4em;
+    overflow-y: auto;
+    max-height: auto;
+    overflow-x: hidden;
+}
+#functionList div{
+    border-bottom: 1px white solid;
+}
+::-webkit-scrollbar{
+    display:none;
+}

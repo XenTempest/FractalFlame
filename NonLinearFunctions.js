@@ -1,10 +1,25 @@
-const is3D = false;
+let is3D = false;
 class NonLinearFunction{
     constructor(name, implementation, params = 0){
         this.name = name;
         this.implementation = implementation; 
         this.params = params;
         this.isActive = false;
+    }
+    createUI(){
+        const functionContainer = document.createElement("div");
+        const functionName = document.createElement("span");
+        const functionCheckBox = document.createElement("input");
+        functionName.textContent = this.name; 
+        functionCheckBox.setAttribute("type", "checkbox");
+        functionCheckBox.checked = this.isActive; 
+        functionCheckBox.addEventListener("change", () => {
+            this.isActive = functionCheckBox.checked;
+            syncWithUI();
+        });
+        functionContainer.appendChild(functionName);
+        functionContainer.appendChild(functionCheckBox);
+        return functionContainer;
     }
 }
 

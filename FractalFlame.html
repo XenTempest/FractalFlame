@@ -5,27 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FractalFlame!</title>
-    <style>
-        body{
-            margin: 0;
-            overflow: hidden;
-            background-color: black;
-        }
-        canvas{
-            width: 100vw;
-            height: 100vh;
-        }
-    </style>
+    <link href="FractalFlame.css" rel="stylesheet">
     <script src="NonLinearFunctions.js"></script>
     <script src="VectorMath.js"></script>
     <script src="MatrixMath.js"></script>
+
 </head>
 
 <body>
     <canvas id="canvas">
         Uh oh
     </canvas>
+    <button id="toggleMenu"><span>⚙️</span></button>
+    <aside id="menu">
+        <h3>SETTINGS</h3>
+        <button id="randColors">Randomize Palette</button>
+        <button id="randWeights">Randomize Weights</button>
+        <button id="randMatrices">Randomize Matrices</button>
+        <button id="refresh">Refresh Screen</button>
+        <button id="submitChanges">Submit Changes</button>
+        <div>Instant Changes:<input id="reactive" type="checkbox"></div>
+        <div>Random Matrices: <input id="randomMatrices" type="number" inputmode="numeric" value="2"></div>
+        <div id="functionList"></div>
+    </aside>
     <script src="FractalFlame.js"></script>
+    <script src="UI.js"></script>
 </body>
 
 </html>
