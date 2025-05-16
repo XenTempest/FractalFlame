@@ -3,7 +3,13 @@ class NonLinearFunction {
     constructor(name, implementation, params = 0) {
         this.name = name;
         this.implementation = implementation;
-        this.params = params;
+        this.params = [];
+        for (let i = 0; i < params; i++){
+            this.params.push(sinRandom() * 5)
+        }
+        if (params){
+           this.implementation = this.implementation(this.params);
+        }
         this.isActive = false;
     }
     createUI() {
@@ -12,13 +18,27 @@ class NonLinearFunction {
         const functionCheckBox = document.createElement("input");
         functionName.textContent = this.name;
         functionCheckBox.setAttribute("type", "checkbox");
+        
         functionCheckBox.checked = this.isActive;
         functionCheckBox.addEventListener("change", () => {
             this.isActive = functionCheckBox.checked;
             syncWithUI();
         });
         functionContainer.appendChild(functionName);
-        functionContainer.appendChild(functionCheckBox);
+        functionName.appendChild(functionCheckBox);
+        functionName.classList.add("name");
+        for (let i = 0; i < this.params.length; i++) {
+            const functionSlider = document.createElement("input");
+            functionSlider.setAttribute("type", "range");
+            functionSlider.setAttribute("min", "-5");
+            functionSlider.setAttribute("max", "5");
+            functionSlider.setAttribute("value", this.params[i].toString());
+            functionSlider.addEventListener("change", () => {
+                this.params[i] = +functionSlider.value;
+                submitChanges(); 
+            })
+            functionContainer.appendChild(functionSlider);
+        }
         return functionContainer;
     }
 }
@@ -26,7 +46,9 @@ class NonLinearFunction {
 function toStep(f) {
     return is3D ? (p) => new Vector3D(f(p.x), f(p.y), f(p.z)) : (p) => new Vector2D(f(p.x), f(p.y));
 }
-
+function sinRandom() {
+    return Math.random() * 2 - 1;
+}
 const nonLinearFunctions = [
     new NonLinearFunction("Spherical", p => p.scale(1 / (p.length() ** 2))),
     new NonLinearFunction("Swirl", p => {
@@ -39,12 +61,10 @@ const nonLinearFunctions = [
         let r = p.length();
         return make2DVec((p.x - p.y) * (p.x + p.y), 2 * (p.x * p.y)).scale(1 / r);
     }),
-    new NonLinearFunction("Popcorn", p => {
+    new NonLinearFunction("Popcorn", params => p => {
         const { x, y } = p;
-        const c = 2;
-        const f = .8;
-        return make2DVec(x + c * Math.sin(Math.tan(3 * y)), y + f * Math.sin(Math.tan(3 * x)));
-    }),
+        return make2DVec(x + params[0] * Math.sin(Math.tan(3 * y)), y + params[1] * Math.sin(Math.tan(3 * x)));
+    }, 2),
     new NonLinearFunction("Square Root", toStep(x => Math.sqrt(Math.abs(x)))),
     new NonLinearFunction("Cube Root", toStep(Math.cbrt)),
     new NonLinearFunction("Sine", toStep(Math.sin)),

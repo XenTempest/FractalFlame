@@ -141,8 +141,7 @@ button {
 #menu button {
     width: 100%;
 }
-
-#menu div {
+#menu div, .name{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -164,6 +163,8 @@ button {
 
 #functionList div {
     border-bottom: 1px white solid;
+    gap: 0.4em;
+    flex-direction: column;
 }
 
 ::-webkit-scrollbar {

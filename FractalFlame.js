@@ -54,9 +54,6 @@ for (let i = 0; i < 100; i++) {
     });
     resetPoint(points[i]);
 }
-function sinRandom() {
-    return Math.random() * 2 - 1;
-}
 function randomMatrix() {
     if (is3D) {
         return new Matrix3D(sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom());
