@@ -25,7 +25,7 @@ const brush = canvas.getContext("2d", { willReadFrequently: true });
 let center = new Vector2D(canvas.width / 2, canvas.height / 2);
 let color = 0;
 function choose(f, p) {
-    let r = Math.random();
+    const r = Math.random();
     let sum = 0;
     for (let i = 0; i < f.length; i++) {
         sum += p.get(f[i]);
@@ -36,7 +36,7 @@ function choose(f, p) {
 }
 function toScreenSpace(p) {
     if (is3D) {
-        let z = p.z + 2;
+        const z = p.z + 2;
         p = new Vector2D(p.x, p.y);
         p = p.scale(1 / z);
     }
@@ -46,7 +46,7 @@ function toScreenSpace(p) {
 function resetPoint(point) {
     point.vector = is3D ? new Vector3D(sinRandom(), sinRandom(), sinRandom()) : new Vector2D(sinRandom(), sinRandom());
 }
-let points = [];
+const points = [];
 for (let i = 0; i < 100; i++) {
     points.push({
         vector: is3D ? new Vector3D(0, 0, 0) : new Vector2D(0, 0),
@@ -100,12 +100,12 @@ function randMatrices() {
     submitChanges();
 }
 function clownToClownCommunicate(a, m, f) {
-    for (let key of m.keys()) {
+    for (const key of m.keys()) {
         if (!a.includes(key)) {
             m.delete(key);
         }
     }
-    for (let key of a) {
+    for (const key of a) {
         if (!m.has(key)) {
             m.set(key, f());
         }
@@ -134,7 +134,7 @@ function refresh() {
     }
     imageData.data.fill(0);
 }
-let stepProbs = new Map();
+const stepProbs = new Map();
 let normalStepProbs;
 function randWeights() {
     stepProbs.clear();
