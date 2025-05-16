@@ -10,6 +10,7 @@ function randomizeAll() {
     randMatrices();
     randWeights();
 }
+bindButton(disableAll); 
 bindButton(randomizeAll);
 bindButton(randColors);
 bindButton(randMatrices);

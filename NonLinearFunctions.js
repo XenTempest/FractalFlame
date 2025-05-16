@@ -24,6 +24,11 @@ class NonLinearFunction {
             this.isActive = functionCheckBox.checked;
             syncWithUI();
         });
+        const uncheckAll = document.getElementById("disableAll")
+        uncheckAll.addEventListener("click", () => {
+            functionCheckBox.checked = false;
+            this.isActive = false;
+        })
         functionContainer.appendChild(functionName);
         functionName.appendChild(functionCheckBox);
         functionName.classList.add("name");
@@ -49,6 +54,9 @@ function toStep(f) {
 }
 function sinRandom() {
     return Math.random() * 2 - 1;
+}
+function disableAll(){
+    syncWithUI(); 
 }
 const nonLinearFunctions = [
     new NonLinearFunction("Spherical", p => p.scale(1 / (p.length() ** 2))),
