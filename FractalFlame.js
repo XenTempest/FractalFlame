@@ -63,7 +63,7 @@ function randomMatrix() {
     }
     return new Matrix2D(sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom(), sinRandom());
 }
-let randomMatrices = 2; 
+let randomMatrices = 2;
 function randomMatrixFn() {
     return matrixFn(randomMatrix());
 }
@@ -78,12 +78,14 @@ function lerp(a, b, t) {
 }
 function normalizeDistribution(d) {
     let sum = 0;
+    const normalizedProbs = new Map()
     for (let value of d.values()) {
         sum += value;
     }
     for (let key of d.keys()) {
-        d.set(key, d.get(key)/sum);
+        normalizedProbs.set(key, d.get(key) / sum);
     }
+    return normalizedProbs;
 }
 
 function randColor() {
@@ -94,55 +96,55 @@ function make2DVec(x, y) {
 }
 let time = 0;
 let matrices = [];
-function randMatrices(){
-    matrices =[];
-    for(let i = 0; i < randomMatrices; i++){
+function randMatrices() {
+    matrices = [];
+    for (let i = 0; i < randomMatrices; i++) {
         matrices.push(randomMatrixFn());
     }
     submitChanges();
 }
-function clownToClownCommunicate(a, m, f){
-    for (let key of m.keys()){
-        if (!a.includes(key)){
+function clownToClownCommunicate(a, m, f) {
+    for (let key of m.keys()) {
+        if (!a.includes(key)) {
             m.delete(key);
         }
     }
-    for (let key of a){
-        if(!m.has(key)){
+    for (let key of a) {
+        if (!m.has(key)) {
             m.set(key, f());
         }
     }
 }
 let stepOpts;
-function submitChanges(){
+function submitChanges() {
     stepOpts = [];
-    for (let i = 0; i < nonLinearFunctions.length; i++){
-        if (nonLinearFunctions[i].isActive){
+    for (let i = 0; i < nonLinearFunctions.length; i++) {
+        if (nonLinearFunctions[i].isActive) {
             stepOpts.push(nonLinearFunctions[i].implementation);
         }
     }
-    if (randomMatrices !== matrices.length){
+    if (randomMatrices !== matrices.length) {
         randMatrices();
     }
     stepOpts.push(...matrices);
     clownToClownCommunicate(stepOpts, stepProbs, Math.random);
     clownToClownCommunicate(stepOpts, stepColors, randColor);
-    normalizeDistribution(stepProbs);
+    normalStepProbs = normalizeDistribution(stepProbs);
     refresh();
 }
-function refresh(){
-    for (let i = 0; i < points.length; i++){
+function refresh() {
+    for (let i = 0; i < points.length; i++) {
         resetPoint(points[i]);
     }
     brush.clearRect(0, 0, canvas.width, canvas.height);
 }
 let stepProbs = new Map();
+let normalStepProbs;
 function randWeights() {
     stepProbs.clear();
     for (let i = 0; i < stepOpts.length; i++) {
         stepProbs.set(stepOpts[i], Math.random());
     }
-    normalizeDistribution(stepProbs);
     submitChanges();
 }
 
@@ -161,15 +163,15 @@ function animate() {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
 
-            const currFunction = choose(stepOpts, stepProbs);
+            const currFunction = choose(stepOpts, normalStepProbs);
             const currColor = stepColors.get(currFunction);
             point.vector = currFunction(point.vector);
             point.color.incorporate(currColor);
 
             const screenPoint = toScreenSpace(point.vector);
 
-            if ((screenPoint.x < canvas.width && screenPoint.x > 0)
-                && (screenPoint.y < canvas.height && screenPoint.y > 0) && i > 20) {
+            if ((screenPoint.y < canvas.height && screenPoint.y > 0)
+                && (screenPoint.x < canvas.width && screenPoint.x > 0) && i > 20) {
                 const pixelChunk = (screenPoint.x + canvas.width * screenPoint.y) * 4;
                 const alpha = point.color.a;
                 imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
@@ -177,7 +179,7 @@ function animate() {
                 imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
                 imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
             }
-        }
+        } 
         time++;
     }
     for (let i = 0; i < 10; i++) {

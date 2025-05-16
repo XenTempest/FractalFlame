@@ -24,6 +24,6 @@ function syncWithUI() {
     }
 }
 const functionList = document.getElementById("functionList");
-for (let fn of nonLinearFunctions){
+for (let fn of nonLinearFunctions) {
     functionList.appendChild(fn.createUI());
 }
