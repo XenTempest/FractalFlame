@@ -16,6 +16,9 @@ bindButton(randMatrices);
 bindButton(randWeights);
 bindButton(refresh);
 bindButton(submitChanges);
+window.addEventListener("beforeunload", (event) => {
+    event.preventDefault();
+});
 const reactiveBox = document.getElementById("reactive");
 const matrixInput = document.getElementById("randomMatrices");
 reactiveBox.addEventListener("change", syncWithUI);
