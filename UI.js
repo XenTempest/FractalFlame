@@ -5,6 +5,12 @@ function bindButton(f) {
     const button = document.getElementById(f.name);
     button.addEventListener("click", f);
 }
+function randomizeAll() {
+    randColors();
+    randMatrices();
+    randWeights();
+}
+bindButton(randomizeAll);
 bindButton(randColors);
 bindButton(randMatrices);
 bindButton(randWeights);

@@ -91,7 +91,6 @@ function randColor() {
 function make2DVec(x, y) {
     return is3D ? new Vector3D(x, y, 0) : new Vector2D(x, y);
 }
-let time = 0;
 let matrices = [];
 function randMatrices() {
     matrices = [];
@@ -133,7 +132,7 @@ function refresh() {
     for (let i = 0; i < points.length; i++) {
         resetPoint(points[i]);
     }
-    brush.clearRect(0, 0, canvas.width, canvas.height);
+    imageData.data.fill(0);
 }
 let stepProbs = new Map();
 let normalStepProbs;
@@ -153,16 +152,15 @@ function randColors() {
     }
     submitChanges();
 }
-
+const imageData = brush.getImageData(0, 0, canvas.width, canvas.height);
 function animate() {
-    const imageData = brush.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 1000; i++) {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
 
             const currFunction = choose(stepOpts, normalStepProbs);
             const currColor = stepColors.get(currFunction);
-            point.vector = currFunction(point.vector);
+            point.vector = currFunction(point.vector, point.vector);
             point.color.incorporate(currColor);
 
             const screenPoint = toScreenSpace(point.vector);
@@ -176,8 +174,7 @@ function animate() {
                 imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
                 imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
             }
-        } 
-        time++;
+        }
     }
     for (let i = 0; i < 10; i++) {
         const j = Math.floor(Math.random() * points.length);

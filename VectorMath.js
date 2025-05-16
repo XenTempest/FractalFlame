@@ -1,13 +1,28 @@
-class Vector2D {
+class Vector {
+    get r() {
+        return this.length();
+    }
+    get theta() {
+        return this.angle();
+    }
+    angle() {
+        return Math.atan2(this.y, this.x);
+    }
+    sub(vec2) {
+        return this.add(vec2.inv());
+    }
+    normalize() {
+        return this.scale(1 / this.length());
+    }
+}
+class Vector2D extends Vector {
     constructor(x, y) {
+        super();
         this.x = x;
         this.y = y;
     }
     length() {
         return Math.hypot(this.x, this.y);
-    }
-    angle() {
-        return Math.atan2(this.y, this.x);
     }
     static fromPolar(angle, length) {
         let vecX = length * Math.cos(angle);
@@ -20,9 +35,6 @@ class Vector2D {
     add(vec2) {
         return new Vector2D(this.x + vec2.x, this.y + vec2.y);
     }
-    sub(vec2) {
-        return this.add(vec2.inv());
-    }
     scale(a) {
         return new Vector2D(this.x * a, this.y * a);
     }
@@ -32,12 +44,10 @@ class Vector2D {
     cross(vec2) {
         return this.x * vec2.y - this.y * vec2.x;
     }
-    normalize() {
-        return this.scale(1 / this.length());
-    }
 }
-class Vector3D {
+class Vector3D extends Vector {
     constructor(x, y, z) {
+        super();
         this.x = x;
         this.y = y;
         this.z = z;
@@ -45,18 +55,13 @@ class Vector3D {
     length() {
         return Math.hypot(this.x, this.y, this.z);
     }
-    angle() {
-        return Math.atan2(this.y, this.x, this.z);
-    }
     inv() {
         return new Vector3D(-this.x, -this.y, -this.z);
     }
     add(vec2) {
         return new Vector3D(this.x + vec2.x, this.y + vec2.y, this.z + vec2.z);
     }
-    sub(vec2) {
-        return this.add(vec2.inv());
-    }
+
     scale(a) {
         return new Vector3D(this.x * a, this.y * a, this.z * a);
     }
@@ -64,9 +69,10 @@ class Vector3D {
         return this.x * vec2.x + this.y * vec2.y + this.z * vec2.z;
     }
     cross(vec2) {
-        return this.x * vec2.y - this.y * vec2.x;
-    }
-    normalize() {
-        return this.scale(1 / this.length());
+        return new Vector3D(
+            this.y * vec2.z - this.z * vec2.y,
+            this.x * vec2.z - this.z * vec2.x,
+            this.x * vec2.y - this.y * vec2.x
+        );
     }
 }
