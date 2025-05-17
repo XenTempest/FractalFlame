@@ -1,13 +1,14 @@
 let is3D = false;
 class NonLinearFunction {
-    constructor(name, implementation, params = 0) {
+    constructor(name, implementation, paramsRadii = []) {
         this.name = name;
         this.implementation = implementation;
         this.params = [];
-        for (let i = 0; i < params; i++) {
-            this.params.push(sinRandom() * 5);
+        this.paramsRadii = paramsRadii;
+        for (let i = 0; i < paramsRadii.length; i++) {
+            this.params.push(sinRandom() * paramsRadii[i]);
         }
-        if (params) {
+        if (paramsRadii.length) {
             this.implementation = this.implementation(this.params);
         }
         this.isActive = false;
@@ -35,8 +36,8 @@ class NonLinearFunction {
         for (let i = 0; i < this.params.length; i++) {
             const functionSlider = document.createElement("input");
             functionSlider.setAttribute("type", "range");
-            functionSlider.setAttribute("min", "-5");
-            functionSlider.setAttribute("max", "5");
+            functionSlider.setAttribute("min", (-this.paramsRadii[i]).toString());
+            functionSlider.setAttribute("max", this.paramsRadii[i].toString());
             functionSlider.setAttribute("value", this.params[i].toString());
             functionSlider.setAttribute("step", "0.001")
             functionSlider.addEventListener("change", () => {
@@ -77,7 +78,7 @@ const nonLinearFunctions = [
     }),
     new NonLinearFunction("Popcorn", params => ({ x, y }) => {
         return make2DVec(x + params[0] * Math.sin(Math.tan(3 * y)), y + params[1] * Math.sin(Math.tan(3 * x)));
-    }, 2),
+    }, [2, 2]),
     new NonLinearFunction("Polar", ({ r, theta }) => {
         return make2DVec(theta / Math.PI, r - 1);
     }),
@@ -100,10 +101,10 @@ const nonLinearFunctions = [
     }),
     new NonLinearFunction("Julia", params => ({ r, theta }) => {
         return make2DVec(Math.cos(theta / 2 + params[0]), Math.sin(theta / 2 + params[0])).scale(Math.sqrt(r));
-    }, 1),
+    }, [10]),
     new NonLinearFunction("Waves", params => ({x, y}) => {
         return make2DVec((x + (params[0] * Math.sin(y/params[1]**2))), (y + (params[2] * Math.sin(x/params[3] ** 2))));
-    }, 4),
+    }, [1, 1, 1, 1]),
     new NonLinearFunction("Exponential", ({x, y}) => {
         return make2DVec(Math.cos(Math.PI * y), Math.sin(Math.PI * y)).scale(Math.exp(x - 1));
     }),
@@ -111,7 +112,7 @@ const nonLinearFunctions = [
         const t1 = 1 + params[0] * x + params[1] * (x**2 - y**2);
         const t2 = params[0] * y + 2 * params[1] * x * y;
         return make2DVec(x * t1 + y * t2, y * t1 - x * t2).scale(1/(t1 ** 2 + t2 ** 2));
-    }, 2),
+    }, [2, 2]),
     new NonLinearFunction("Square Root", toStep(x => Math.sqrt(Math.abs(x)))),
     new NonLinearFunction("Cube Root", toStep(Math.cbrt)),
     new NonLinearFunction("Sine", toStep(Math.sin)),
