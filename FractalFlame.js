@@ -73,9 +73,10 @@ function remap(n, initialMin, initialMax, finalMin, finalMax) {
 function lerp(a, b, t) {
     return a * (1 - t) + b * t;
 }
+let matrixWeight = 0.5;
 function normalizeDistribution(d) {
     let sum = 0;
-    const normalizedProbs = new Map()
+    const normalizedProbs = new Map();
     for (let value of d.values()) {
         sum += value;
     }
@@ -84,7 +85,16 @@ function normalizeDistribution(d) {
     }
     return normalizedProbs;
 }
-
+function getWeightCoefficient(fn) {
+    if (isNonLinearFunction(fn)) {
+        const intendedPrevalence = 1 - matrixWeight;
+        const currentPrevalence = (stepOpts.length - randomMatrices) / stepOpts.length
+        return intendedPrevalence / currentPrevalence;
+    }
+    const intendedPrevalence = matrixWeight;
+    const currPrevalence = randomMatrices / stepOpts.length;
+    return intendedPrevalence / currPrevalence;
+}
 function randColor() {
     return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, .1);
 }
@@ -112,6 +122,14 @@ function clownToClownCommunicate(a, m, f) {
     }
 }
 let stepOpts;
+function isNonLinearFunction(fn) {
+    for (let i = 0; i < stepOpts.length - randomMatrices; i++) {
+        if (fn === stepOpts[i]) {
+            return true;
+        }
+    }
+    return false;
+}
 function submitChanges() {
     stepOpts = [];
     for (let i = 0; i < nonLinearFunctions.length; i++) {
@@ -122,10 +140,16 @@ function submitChanges() {
     if (randomMatrices !== matrices.length) {
         randMatrices();
     }
+
+
     stepOpts.push(...matrices);
     clownToClownCommunicate(stepOpts, stepProbs, Math.random);
     clownToClownCommunicate(stepOpts, stepColors, randColor);
-    normalStepProbs = normalizeDistribution(stepProbs);
+    const distortedStepProbs = new Map();
+    for (let [key, value] of stepProbs) {
+        distortedStepProbs.set(key, value * getWeightCoefficient(key));
+    }
+    normalStepProbs = normalizeDistribution(distortedStepProbs);
     refresh();
 }
 function refresh() {

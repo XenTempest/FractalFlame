@@ -10,7 +10,7 @@ function randomizeAll() {
     randMatrices();
     randWeights();
 }
-bindButton(disableAll); 
+bindButton(disableAll);
 bindButton(randomizeAll);
 bindButton(randColors);
 bindButton(randMatrices);
@@ -19,16 +19,25 @@ bindButton(refresh);
 bindButton(submitChanges);
 window.addEventListener("beforeunload", (event) => {
     event.preventDefault();
+
 });
 const reactiveBox = document.getElementById("reactive");
 const matrixInput = document.getElementById("randomMatrices");
+const matrixWeightInput = document.getElementById("matrixWeight");
+matrixWeightInput.addEventListener("change", () => {
+    matrixWeight = +matrixWeightInput.value;
+    syncWithUI();
+})
+
 reactiveBox.addEventListener("change", syncWithUI);
-matrixInput.addEventListener("change", syncWithUI);
-function syncWithUI() {
+matrixInput.addEventListener("change", () => {
     const matrixCount = +matrixInput.value;
     if (0 <= matrixCount && matrixCount <= 50) {
         randomMatrices = matrixCount;
     }
+    syncWithUI()
+});
+function syncWithUI() {
     if (reactiveBox.checked) {
         submitChanges();
     }

@@ -5,7 +5,7 @@ class NonLinearFunction {
         this.implementation = implementation;
         this.params = [];
         for (let i = 0; i < params; i++) {
-            this.params.push(sinRandom() * 5)
+            this.params.push(sinRandom() * 5);
         }
         if (params) {
             this.implementation = this.implementation(this.params);
@@ -24,7 +24,7 @@ class NonLinearFunction {
             this.isActive = functionCheckBox.checked;
             syncWithUI();
         });
-        const uncheckAll = document.getElementById("disableAll")
+        const uncheckAll = document.getElementById("disableAll");
         uncheckAll.addEventListener("click", () => {
             functionCheckBox.checked = false;
             this.isActive = false;
@@ -42,7 +42,7 @@ class NonLinearFunction {
             functionSlider.addEventListener("change", () => {
                 this.params[i] = +functionSlider.value;
                 submitChanges();
-            })
+            });
             functionContainer.appendChild(functionSlider);
         }
         return functionContainer;

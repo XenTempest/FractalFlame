@@ -185,3 +185,6 @@ h4 {
 ::-webkit-scrollbar {
     display: none;
 }
+#matrixWeight {
+    width: 50%;
+}
