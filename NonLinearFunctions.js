@@ -56,8 +56,11 @@ function toStep(f) {
 function sinRandom() {
     return Math.random() * 2 - 1;
 }
-function disableAll(){
-    syncWithUI(); 
+function disableAll() {
+    syncWithUI();
+}
+function mod(numerator, denominator) {
+    return (numerator % denominator + denominator) % denominator;
 }
 const nonLinearFunctions = [
     new NonLinearFunction("Spherical", p => p.scale(1 / (p.length() ** 2))),
@@ -102,17 +105,57 @@ const nonLinearFunctions = [
     new NonLinearFunction("Julia", params => ({ r, theta }) => {
         return make2DVec(Math.cos(theta / 2 + params[0]), Math.sin(theta / 2 + params[0])).scale(Math.sqrt(r));
     }, [10]),
-    new NonLinearFunction("Waves", params => ({x, y}) => {
-        return make2DVec((x + (params[0] * Math.sin(y/params[1]**2))), (y + (params[2] * Math.sin(x/params[3] ** 2))));
+    new NonLinearFunction("Waves", params => ({ x, y }) => {
+        return make2DVec((x + (params[0] * Math.sin(y / params[1] ** 2))), (y + (params[2] * Math.sin(x / params[3] ** 2))));
     }, [1, 1, 1, 1]),
-    new NonLinearFunction("Exponential", ({x, y}) => {
+    new NonLinearFunction("Exponential2", ({ x, y }) => {
         return make2DVec(Math.cos(Math.PI * y), Math.sin(Math.PI * y)).scale(Math.exp(x - 1));
     }),
-    new NonLinearFunction("Curl", params => ({x, y}) => {
-        const t1 = 1 + params[0] * x + params[1] * (x**2 - y**2);
+    new NonLinearFunction("Curl", params => ({ x, y }) => {
+        const t1 = 1 + params[0] * x + params[1] * (x ** 2 - y ** 2);
         const t2 = params[0] * y + 2 * params[1] * x * y;
-        return make2DVec(x * t1 + y * t2, y * t1 - x * t2).scale(1/(t1 ** 2 + t2 ** 2));
+        return make2DVec(x * t1 + y * t2, y * t1 - x * t2).scale(1 / (t1 ** 2 + t2 ** 2));
     }, [2, 2]),
+    new NonLinearFunction("Fisheye", ({ x, y, r }) => {
+        return make2DVec(y, x).scale(2 / (r + 1));
+    }),
+    new NonLinearFunction("Eyefish", ({x, y, r}) => {
+        return make2DVec(x, y).scale(2 / (r + 1));
+    }),
+    new NonLinearFunction("Power", ({ r, theta }) => {
+        return make2DVec(Math.cos(theta), Math.sin(theta)).scale(Math.pow(r, Math.sin(theta)));
+    }),
+    new NonLinearFunction("Cosine2", ({ x, y }) => {
+        return make2DVec(Math.cos(Math.PI * x) * Math.cosh(y), -Math.sin(Math.PI * x) * Math.sinh(y));
+    }),
+    new NonLinearFunction("Rings", params => ({ r, theta }) => {
+        return make2DVec(Math.cos(theta), Math.sin(theta)).scale(
+            mod(r + params[0] ** 2, 2 * params[0] ** 2) -
+            params[0] ** 2 + r * (1 - params[0] ** 2)
+        );
+    }, [2]),
+    new NonLinearFunction("Fan", params => ({r, theta}) => {
+        const t = Math.PI * params[0] ** 2;
+        if (mod(theta + params[1], t) > t/2){
+            return make2DVec(Math.cos(theta - t/2), Math.sin(theta - t/2)).scale(r);
+        }
+        return make2DVec(Math.cos(theta + t/2), Math.sin(theta + t/2)).scale(r); 
+    }, [2, 2]),
+    new NonLinearFunction("Blob", params => ({r, theta}) => {
+        return make2DVec(Math.cos(theta), Math.sin(theta)).scale(r * (params[1] + (params[0] - params[1])/2 * (Math.sin(params[2] * theta) + 1)));
+    }, [2, 2, 2]),
+    new NonLinearFunction("PDJ", params => ({x, y}) => {
+        return make2DVec(Math.sin(params[0] * y) - Math.cos(params[1] * x), Math.sin(params[2] * x) - Math.cos(params[3] * y));
+    }, [2, 2, 2, 2]),
+    new NonLinearFunction("Bubble", ({x, y, r}) => {
+        return make2DVec(x, y).scale(4/(r ** 2 + 4)); 
+    }),
+    new NonLinearFunction("Cylinder", ({x, y}) => {
+        return make2DVec(Math.sin(x), y);
+    }),
+    new NonLinearFunction("Perspective", params => ({x, y}) => {
+        return make2DVec(x, y * Math.cos(params[0])).scale(params[1]/(params[1] - y * Math.sin(params[0])));
+    }, [Math.PI/2, 2]),
     new NonLinearFunction("Square Root", toStep(x => Math.sqrt(Math.abs(x)))),
     new NonLinearFunction("Cube Root", toStep(Math.cbrt)),
     new NonLinearFunction("Sine", toStep(Math.sin)),
@@ -138,6 +181,3 @@ function setActive(name, isActive = true) {
 }
 setActive("Swirl");
 setActive("Cube Root");
-// activate("TRANGLe 1");
-// activate("TRANGLe 2");
-// activate("TRANGLe 3");

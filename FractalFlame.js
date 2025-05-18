@@ -178,28 +178,29 @@ function randColors() {
 }
 const imageData = brush.getImageData(0, 0, canvas.width, canvas.height);
 function animate() {
-    for (let i = 0; i < 1000; i++) {
-        for (let j = 0; j < points.length; j++) {
-            const point = points[j];
+    if (choose(stepOpts, normalStepProbs))
+        for (let i = 0; i < 1000; i++) {
+            for (let j = 0; j < points.length; j++) {
+                const point = points[j];
 
-            const currFunction = choose(stepOpts, normalStepProbs);
-            const currColor = stepColors.get(currFunction);
-            point.vector = currFunction(point.vector, point.vector);
-            point.color.incorporate(currColor);
+                const currFunction = choose(stepOpts, normalStepProbs);
+                const currColor = stepColors.get(currFunction);
+                point.vector = currFunction(point.vector, point.vector);
+                point.color.incorporate(currColor);
 
-            const screenPoint = toScreenSpace(point.vector);
+                const screenPoint = toScreenSpace(point.vector);
 
-            if ((screenPoint.y < canvas.height && screenPoint.y > 0)
-                && (screenPoint.x < canvas.width && screenPoint.x > 0) && i > 20) {
-                const pixelChunk = (screenPoint.x + canvas.width * screenPoint.y) * 4;
-                const alpha = point.color.a;
-                imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
-                imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
-                imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
-                imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
+                if ((screenPoint.y < canvas.height && screenPoint.y > 0)
+                    && (screenPoint.x < canvas.width && screenPoint.x > 0) && i > 20) {
+                    const pixelChunk = (screenPoint.x + canvas.width * screenPoint.y) * 4;
+                    const alpha = point.color.a;
+                    imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
+                    imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
+                    imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
+                    imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
+                }
             }
         }
-    }
     for (let i = 0; i < 10; i++) {
         const j = Math.floor(Math.random() * points.length);
         resetPoint(points[j]);
