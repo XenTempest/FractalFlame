@@ -96,7 +96,7 @@ function getWeightCoefficient(fn) {
     return intendedPrevalence / currPrevalence;
 }
 function randColor() {
-    return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, .1);
+    return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random()/20);
 }
 function make2DVec(x, y) {
     return is3D ? new Vector3D(x, y, 0) : new Vector2D(x, y);
@@ -135,7 +135,11 @@ function submitChanges() {
     for (let i = 0; i < nonLinearFunctions.length; i++) {
         if (nonLinearFunctions[i].isActive) {
             stepOpts.push(nonLinearFunctions[i].implementation);
+            for (let j = 0; j < nonLinearFunctions[i].values.length; j++){
+                nonLinearFunctions[i].params[j] = nonLinearFunctions[i].values[j];
+            }
         }
+        
     }
     if (randomMatrices !== matrices.length) {
         randMatrices();

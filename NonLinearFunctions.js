@@ -3,11 +3,12 @@ class NonLinearFunction {
     constructor(name, implementation, paramsRadii = []) {
         this.name = name;
         this.implementation = implementation;
-        this.params = [];
+        this.values = [];
         this.paramsRadii = paramsRadii;
         for (let i = 0; i < paramsRadii.length; i++) {
-            this.params.push(sinRandom() * paramsRadii[i]);
+            this.values.push(sinRandom() * paramsRadii[i]);
         }
+        this.params = [...this.values];
         if (paramsRadii.length) {
             this.implementation = this.implementation(this.params);
         }
@@ -39,12 +40,13 @@ class NonLinearFunction {
             functionSlider.setAttribute("min", (-this.paramsRadii[i]).toString());
             functionSlider.setAttribute("max", this.paramsRadii[i].toString());
             functionSlider.setAttribute("value", this.params[i].toString());
-            functionSlider.setAttribute("step", "0.001")
+            functionSlider.setAttribute("step", "0.001");
             functionSlider.addEventListener("change", () => {
-                this.params[i] = +functionSlider.value;
-                submitChanges();
+                this.values[i] = +functionSlider.value;
+                syncWithUI();
             });
             functionContainer.appendChild(functionSlider);
+            // this.params[i] = this.values[i];
         }
         return functionContainer;
     }
@@ -179,5 +181,6 @@ function setActive(name, isActive = true) {
         }
     }
 }
-setActive("Swirl");
-setActive("Cube Root");
+setActive("Julia");
+// setActive("Swirl");
+// setActive("Cube Root");
