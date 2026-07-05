@@ -95,6 +95,7 @@ background: white;
     }
 }
 
+
 input[type="range"] {
     appearance: none;
     -webkit-appearance: none;
@@ -105,7 +106,8 @@ input[type="range"] {
     position: relative;
     top: 1px;
 
-    &::before {
+    &::-webkit-slider-runnable-track,
+    &::-moz-range-track {
         content: "";
         position: absolute;
         left: 0;
@@ -116,18 +118,21 @@ input[type="range"] {
         display: block;
     }
 
-    &::-webkit-slider-thumb {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb {
         appearance: none;
         width: 1em;
         height: 1em;
         display: block;
         background: white;
         border: 1px white solid;
+        border-radius: 0;
         padding: 0;
         margin: 0;
         cursor: pointer;
     }
 }
+
 
 button {
     border: 1px white solid;
@@ -171,13 +176,16 @@ button {
     overflow-y: auto;
     max-height: auto;
     overflow-x: hidden;
+    scrollbar-width: none;
 }
+
 h4 {
     padding-block: 0.2em;
 }
+
 #functionList div {
     /* border-bottom: 1px white solid; */
-    gap: 0.4em; 
+    gap: 0.4em;
     padding-bottom: 0.4em;
     flex-direction: column;
 }
@@ -185,6 +193,7 @@ h4 {
 ::-webkit-scrollbar {
     display: none;
 }
+
 #matrixWeight {
     width: 50%;
 }
