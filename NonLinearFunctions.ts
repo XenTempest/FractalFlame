@@ -1,15 +1,26 @@
-let is3D = false;
+const is3D = false;
 class NonLinearFunction {
-    constructor(name, implementation, paramsRadii = []) {
+    implementation: StepOpt ;
+    params: number[];
+    paramsRadii: number[];
+    isActive: boolean;
+    values: number[];
+    constructor(name: string, implementation: StepOpt);
+    constructor(name: string, implementation: (params: number[]) => StepOpt, paramsRadii: number[]);
+    constructor(public name: string, implementation: StepOpt | ((params: number[]) => StepOpt), paramsRadii: number[] = []) {
         this.name = name;
-        this.implementation = implementation;
-        this.params = [];
+        
+        this.values = [];
         this.paramsRadii = paramsRadii;
         for (let i = 0; i < paramsRadii.length; i++) {
-            this.params.push(sinRandom() * paramsRadii[i]);
+            this.values.push(sinRandom() * paramsRadii[i]);
         }
+        this.params = [...this.values];
         if (paramsRadii.length) {
-            this.implementation = this.implementation(this.params);
+            this.implementation = (implementation as (params: number[]) => StepOpt)(this.params);
+        }
+        else{
+            this.implementation = implementation as StepOpt;
         }
         this.isActive = false;
     }
@@ -25,11 +36,11 @@ class NonLinearFunction {
             this.isActive = functionCheckBox.checked;
             syncWithUI();
         });
-        const uncheckAll = document.getElementById("disableAll");
+        const uncheckAll = document.getElementById("disableAll")!;
         uncheckAll.addEventListener("click", () => {
             functionCheckBox.checked = false;
             this.isActive = false;
-        })
+        });
         functionContainer.appendChild(functionName);
         functionName.appendChild(functionCheckBox);
         functionName.classList.add("name");
@@ -39,10 +50,10 @@ class NonLinearFunction {
             functionSlider.setAttribute("min", (-this.paramsRadii[i]).toString());
             functionSlider.setAttribute("max", this.paramsRadii[i].toString());
             functionSlider.setAttribute("value", this.params[i].toString());
-            functionSlider.setAttribute("step", "0.001")
+            functionSlider.setAttribute("step", "0.001");
             functionSlider.addEventListener("change", () => {
-                this.params[i] = +functionSlider.value;
-                submitChanges();
+                this.values[i] = +functionSlider.value;
+                syncWithUI();
             });
             functionContainer.appendChild(functionSlider);
         }
@@ -50,8 +61,8 @@ class NonLinearFunction {
     }
 }
 
-function toStep(f) {
-    return is3D ? (p) => new Vector3D(f(p.x), f(p.y), f(p.z)) : (p) => new Vector2D(f(p.x), f(p.y));
+function toStep(f: (posComponent: number) => number) {
+    return /* is3D ? (position: Vector3D) => new Vector3D(f(position.x), f(position.y), f(position.z)) : */ (position: Vector2D) => new Vector2D(f(position.x), f(position.y));
 }
 function sinRandom() {
     return Math.random() * 2 - 1;
@@ -67,8 +78,8 @@ const nonLinearFunctions = [
         const sin = Math.sin(r ** 2);
         return make2DVec(p.x * sin - p.y * cos, p.x * cos + p.y * sin);
     }),
-    new NonLinearFunction("Horseshoe", (p, { r }) => {
-        return make2DVec((p.x - p.y) * (p.x + p.y), 2 * (p.x * p.y)).scale(1 / r);
+    new NonLinearFunction("Horseshoe", (p) => {
+        return make2DVec((p.x - p.y) * (p.x + p.y), 2 * (p.x * p.y)).scale(1 / p.r);
     }),
     new NonLinearFunction("Disc", ({ r, theta }) => {
         return make2DVec(Math.sin(Math.PI * r), Math.cos(Math.PI * r)).scale(theta / Math.PI);
@@ -124,20 +135,17 @@ const nonLinearFunctions = [
     new NonLinearFunction("Exponential", toStep(Math.exp)),
     new NonLinearFunction("Quadratic", toStep(x => x ** 2)),
     new NonLinearFunction("Absolute Value", toStep(Math.abs)),
-    new NonLinearFunction("TRANGLe 1", (p) => p.scale(0.5).add(new Vector3D(0, -0.36, 0))),
-    new NonLinearFunction("TRANGLe 2", (p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5))),
-    new NonLinearFunction("TRANGLe 3", (p) => p.scale(0.5).add(new Vector3D(0.5, 0.5, -0.5)))
+    // new NonLinearFunction("TRANGLe 1", (p) => p.scale(0.5).add(new Vector3D(0, -0.36, 0))),
+    // new NonLinearFunction("TRANGLe 2", (p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5))),
+    // new NonLinearFunction("TRANGLe 3", (p) => p.scale(0.5).add(new Vector3D(0.5, 0.5, -0.5)))
 
 ];
-function setActive(name, isActive = true) {
+function setActive(name: string, isActive = true) {
     for (let i = 0; i < nonLinearFunctions.length; i++) {
         if (name === nonLinearFunctions[i].name) {
             nonLinearFunctions[i].isActive = isActive;
         }
     }
 }
-setActive("Swirl");
-setActive("Cube Root");
-// activate("TRANGLe 1");
-// activate("TRANGLe 2");
-// activate("TRANGLe 3");
+setActive("Julia");
+

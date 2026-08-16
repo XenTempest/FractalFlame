@@ -1,29 +1,29 @@
-const toggleMenu = document.getElementById("toggleMenu");
-const menu = document.getElementById("menu");
+const toggleMenu = document.getElementById("toggleMenu")!;
+const menu = document.getElementById("menu")!;
 toggleMenu.addEventListener("click", () => { menu.classList.toggle("hidden"); });
-function bindButton(f) {
-    const button = document.getElementById(f.name);
+function bindButton(f: () => void) {
+    const button = document.getElementById(f.name)!;
     button.addEventListener("click", f);
 }
 function randomizeAll() {
-    randColors();
-    randMatrices();
-    randWeights();
+    randomizeColors();
+    randomizeMatrices();
+    randomizeProbs();
 }
 bindButton(disableAll);
 bindButton(randomizeAll);
-bindButton(randColors);
-bindButton(randMatrices);
-bindButton(randWeights);
+bindButton(randomizeColors);
+bindButton(randomizeMatrices);
+bindButton(randomizeProbs);
 bindButton(refresh);
 bindButton(submitChanges);
 window.addEventListener("beforeunload", (event) => {
     event.preventDefault();
 
 });
-const reactiveBox = document.getElementById("reactive");
-const matrixInput = document.getElementById("randomMatrices");
-const matrixWeightInput = document.getElementById("matrixWeight");
+const reactiveBox = document.getElementById("reactive")! as HTMLInputElement;
+const matrixInput = document.getElementById("randomMatrices")! as HTMLInputElement;
+const matrixWeightInput = document.getElementById("matrixWeight")! as HTMLInputElement;
 matrixWeightInput.addEventListener("change", () => {
     matrixWeight = +matrixWeightInput.value;
     syncWithUI();
@@ -42,7 +42,7 @@ function syncWithUI() {
         submitChanges();
     }
 }
-const functionList = document.getElementById("functionList");
+const functionList = document.getElementById("functionList")!;
 for (let fn of nonLinearFunctions) {
     functionList.appendChild(fn.createUI());
 }
