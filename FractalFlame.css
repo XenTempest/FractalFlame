@@ -95,6 +95,7 @@ background: white;
     }
 }
 
+
 input[type="range"] {
     appearance: none;
     -webkit-appearance: none;
@@ -115,7 +116,6 @@ input[type="range"] {
         height: 0;
         display: block;
     }
-
     &::-webkit-slider-thumb,
     &::-moz-range-thumb {
         appearance: none;
@@ -125,11 +125,13 @@ input[type="range"] {
         background: white;
         border: 1px white solid;
         border-radius: 0;
+        border-radius: 0;
         padding: 0;
         margin: 0;
         cursor: pointer;
     }
 }
+
 
 button {
     border: 1px white solid;
@@ -174,13 +176,16 @@ button {
     max-height: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+    scrollbar-width: none;
 }
+
 h4 {
     padding-block: 0.2em;
 }
+
 #functionList div {
     /* border-bottom: 1px white solid; */
-    gap: 0.4em; 
+    gap: 0.4em;
     padding-bottom: 0.4em;
     flex-direction: column;
 }
@@ -188,6 +193,7 @@ h4 {
 ::-webkit-scrollbar {
     display: none;
 }
+
 #matrixWeight {
     width: 50%;
 }
