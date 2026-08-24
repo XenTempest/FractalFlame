@@ -196,7 +196,10 @@ function refresh() {
     for (let i = 0; i < points.length; i++) {
         resetPoint(points[i]);
     }
-    imageData.data.fill(0);
+    // imageData.data.fill(0);
+    for (let i = 0; i < histogram.length; i++){
+        histogram[i] = new Color(0, 0, 0, 0);
+    }
 }
 const stepProbs = new Map<StepOpt, number>();
 let normalStepProbs: Map<StepOpt, number>;
@@ -223,11 +226,19 @@ function randomizeColors() {
     submitChanges();
 }
 const imageData = brush.getImageData(0, 0, canvas.width, canvas.height);
+const histogram: Color[] = [];
 const PIXEL_CHUNK_SIZE = 4;
 const INIT_CYCLES = 20;
 const CYCLES_PER_FRAME = 1000;
 const POINTS_RESET_PER_FRAME = 10;
+for (let i = 0; i < canvas.height * canvas.width; i++){
+    histogram.push(new Color(0, 0, 0, 0));
+}
+const LOG_NORMAL_FACTOR = 20;
+const logScale = Math.log1p(LOG_NORMAL_FACTOR);
+const GAMMA = 1/2.2;
 function animate() {
+    let freqMax = 0;
     for (let i = 0; i < CYCLES_PER_FRAME; i++) {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
@@ -240,18 +251,41 @@ function animate() {
 
             if ((screenPoint.y < canvas.height && screenPoint.y > 0)
                 && (screenPoint.x < canvas.width && screenPoint.x > 0) && i > INIT_CYCLES) {
-                const pixelChunk = (screenPoint.x + canvas.width * screenPoint.y) * PIXEL_CHUNK_SIZE;
-                const alpha = point.color.a;
-                imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
-                imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
-                imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
-                imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
+                const pixelIndex = screenPoint.x + canvas.width * screenPoint.y;
+                const histogramPixel = histogram[pixelIndex];
+                histogramPixel.r += point.color.r;
+                histogramPixel.g += point.color.g;
+                histogramPixel.b += point.color.b;
+                histogramPixel.a += point.color.a;
+
+                // imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
+                // imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
+                // imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
+                // imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
             }
         }
     }
     for (let i = 0; i < POINTS_RESET_PER_FRAME; i++) {
         const j = Math.floor(Math.random() * points.length);
         resetPoint(points[j]);
+    }
+    for (let i = 0; i < histogram.length; i++){
+        if (freqMax < histogram[i].a){
+            freqMax = histogram[i].a;
+        }
+    }
+    for (let i = 0; i < histogram.length; i++){
+        const pixel = histogram[i];
+        const imgDataIndex = i * PIXEL_CHUNK_SIZE;
+        const colorScaleCoefficient = 1/Math.max(pixel.r, pixel.g, pixel.b);
+        const density = pixel.a/freqMax;
+        const alpha = (Math.log1p(density * LOG_NORMAL_FACTOR)/logScale) ** GAMMA;
+        const logDensityScaleCoefficient = colorScaleCoefficient * alpha * 255;
+        imageData.data[imgDataIndex] = pixel.r * logDensityScaleCoefficient;
+        imageData.data[imgDataIndex + 1] = pixel.g * logDensityScaleCoefficient;
+        imageData.data[imgDataIndex + 2] = pixel.b * logDensityScaleCoefficient;
+        imageData.data[imgDataIndex + 3] = 255;
+
     }
     requestAnimationFrame(animate);
     brush.putImageData(imageData, 0, 0);
