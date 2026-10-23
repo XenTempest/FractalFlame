@@ -1,5 +1,5 @@
 # Fractal Flame Generator 
-An iterated function system which applies non-linear functions to randomly generated matrices, then blends the color of the resulting particles based on which function was applied.
+An iterated function system which applies non-linear functions to randomly generated matrices. The generator then determines the colors of the resulting particles based on the functions applied, adding the result to a histogram of the particles. The program then displays each pixel based on a histogram-based log-density calculation for each corresponding particle.
 
 For more information regarding fractal flames, visit the [wikipedia page](https://en.wikipedia.org/wiki/Fractal_flame).
 
