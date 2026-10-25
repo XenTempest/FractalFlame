@@ -232,24 +232,20 @@ const PIXEL_CHUNK_SIZE = 4;
 const INIT_CYCLES = 20;
 const CYCLES_PER_FRAME = 1000;
 const POINTS_RESET_PER_FRAME = 10;
-let POINT_STALE_TIME = 1;
+let pointStaleTime = 10;
 for (let i = 0; i < canvas.height * canvas.width; i++) {
     histogram.push(new Color(0, 0, 0, 0));
 }
 const LOG_NORMAL_FACTOR = 20;
 const logScale = Math.log1p(LOG_NORMAL_FACTOR);
 const GAMMA = 1 / 2.2;
+const PARTITION_COUNT = 4; 
 function animate() {
     let freqMax = 0;
     for (let i = 0; i < CYCLES_PER_FRAME; i++) {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
-            if (point.timeUntouched >= POINT_STALE_TIME) {
-                point.timeUntouched = 0;
-                resetPoint(point);
-                console.log("point reset");
-                continue;
-            }
+
             const currFunction = choose(stepOpts, normalStepProbs);
             const currColor = stepColors.get(currFunction)!;
             point.vector = currFunction(point.vector);
@@ -269,6 +265,11 @@ function animate() {
             }
             else {
                 point.timeUntouched++;
+                if (point.timeUntouched >= pointStaleTime) {
+                    point.timeUntouched = 0;
+                    resetPoint(point);
+                    continue;
+                }
             }
         }
     }
@@ -281,7 +282,17 @@ function animate() {
             freqMax = histogram[i].a;
         }
     }
-    for (let i = 0; i < histogram.length; i++) {
+    const PARTITION_LENGTH = Math.floor(histogram.length/PARTITION_COUNT);
+    function choosePartition(){
+        let partitionIndex = Math.floor(Math.random()* (PARTITION_COUNT + 1));
+        let partitionStart = partitionIndex * PARTITION_LENGTH;
+        if (partitionIndex < PARTITION_COUNT){
+            return [partitionStart, partitionStart + PARTITION_LENGTH];
+        }
+        return [partitionStart, histogram.length];
+    }
+    let partition = choosePartition();
+    for (let i = partition[0]; i < partition[1]; i++) {
         const pixel = histogram[i];
         const imgDataIndex = i * PIXEL_CHUNK_SIZE;
         const colorScaleCoefficient = 1 / Math.max(pixel.r, pixel.g, pixel.b);

@@ -30,7 +30,7 @@ matrixWeightInput.addEventListener("change", () => {
     syncWithUI();
 })
 pixelResetTimeInput.addEventListener("change", () => {
-    POINT_STALE_TIME = +pixelResetTimeInput.value; 
+    pointStaleTime = +pixelResetTimeInput.value; 
     syncWithUI();
 })
 
