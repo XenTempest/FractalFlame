@@ -2,7 +2,7 @@ class Matrix2D {
     x: Vector2D;
     y: Vector2D;
     z: Vector2D;
-    constructor(a:number, b:number, c:number, d:number, e:number, f:number) {
+    constructor(a: number, b: number, c: number, d: number, e: number, f: number) {
         this.x = new Vector2D(a, d);
         this.y = new Vector2D(b, e);
         this.z = new Vector2D(c, f);

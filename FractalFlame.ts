@@ -47,13 +47,14 @@ function resetPoint(point: Point) {
     point.vector = new Vector2D(sinRandom(), sinRandom());
     // is3D ? new Vector3D(sinRandom(), sinRandom(), sinRandom()) :
 }
-type Point = { vector: Vector2D, color: Color };
+type Point = { vector: Vector2D, color: Color, timeUntouched: number };
 const points: Point[] = [];
 // On initalization, creates the point array as opaque black points, and resets them to random coordinates
 for (let i = 0; i < POINT_COUNT; i++) {
     points.push({
         vector: /* is3d ? new Vector3D(0, 0, 0) : */ new Vector2D(0, 0),
-        color: new Color(0, 0, 0, 1)
+        color: new Color(0, 0, 0, 1),
+        timeUntouched: 0
     });
     resetPoint(points[i]);
 }
@@ -197,7 +198,7 @@ function refresh() {
         resetPoint(points[i]);
     }
     // imageData.data.fill(0);
-    for (let i = 0; i < histogram.length; i++){
+    for (let i = 0; i < histogram.length; i++) {
         histogram[i] = new Color(0, 0, 0, 0);
     }
 }
@@ -231,18 +232,24 @@ const PIXEL_CHUNK_SIZE = 4;
 const INIT_CYCLES = 20;
 const CYCLES_PER_FRAME = 1000;
 const POINTS_RESET_PER_FRAME = 10;
-for (let i = 0; i < canvas.height * canvas.width; i++){
+let POINT_STALE_TIME = 1;
+for (let i = 0; i < canvas.height * canvas.width; i++) {
     histogram.push(new Color(0, 0, 0, 0));
 }
 const LOG_NORMAL_FACTOR = 20;
 const logScale = Math.log1p(LOG_NORMAL_FACTOR);
-const GAMMA = 1/2.2;
+const GAMMA = 1 / 2.2;
 function animate() {
     let freqMax = 0;
     for (let i = 0; i < CYCLES_PER_FRAME; i++) {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
-
+            if (point.timeUntouched >= POINT_STALE_TIME) {
+                point.timeUntouched = 0;
+                resetPoint(point);
+                console.log("point reset");
+                continue;
+            }
             const currFunction = choose(stepOpts, normalStepProbs);
             const currColor = stepColors.get(currFunction)!;
             point.vector = currFunction(point.vector);
@@ -257,11 +264,11 @@ function animate() {
                 histogramPixel.g += point.color.g;
                 histogramPixel.b += point.color.b;
                 histogramPixel.a += point.color.a;
+                point.timeUntouched = 0;
 
-                // imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
-                // imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
-                // imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
-                // imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
+            }
+            else {
+                point.timeUntouched++;
             }
         }
     }
@@ -269,17 +276,17 @@ function animate() {
         const j = Math.floor(Math.random() * points.length);
         resetPoint(points[j]);
     }
-    for (let i = 0; i < histogram.length; i++){
-        if (freqMax < histogram[i].a){
+    for (let i = 0; i < histogram.length; i++) {
+        if (freqMax < histogram[i].a) {
             freqMax = histogram[i].a;
         }
     }
-    for (let i = 0; i < histogram.length; i++){
+    for (let i = 0; i < histogram.length; i++) {
         const pixel = histogram[i];
         const imgDataIndex = i * PIXEL_CHUNK_SIZE;
-        const colorScaleCoefficient = 1/Math.max(pixel.r, pixel.g, pixel.b);
-        const density = pixel.a/freqMax;
-        const alpha = (Math.log1p(density * LOG_NORMAL_FACTOR)/logScale) ** GAMMA;
+        const colorScaleCoefficient = 1 / Math.max(pixel.r, pixel.g, pixel.b);
+        const density = pixel.a / freqMax;
+        const alpha = (Math.log1p(density * LOG_NORMAL_FACTOR) / logScale) ** GAMMA;
         const logDensityScaleCoefficient = colorScaleCoefficient * alpha * 255;
         imageData.data[imgDataIndex] = pixel.r * logDensityScaleCoefficient;
         imageData.data[imgDataIndex + 1] = pixel.g * logDensityScaleCoefficient;

@@ -133,9 +133,6 @@ const nonLinearFunctions = [
     new NonLinearFunction("Exponential", toStep(Math.exp)),
     new NonLinearFunction("Quadratic", toStep(x => x ** 2)),
     new NonLinearFunction("Absolute Value", toStep(Math.abs)),
-    // new NonLinearFunction("TRANGLe 1", (p) => p.scale(0.5).add(new Vector3D(0, -0.36, 0))),
-    // new NonLinearFunction("TRANGLe 2", (p) => p.scale(0.5).add(new Vector3D(-0.5, 0.5, -0.5))),
-    // new NonLinearFunction("TRANGLe 3", (p) => p.scale(0.5).add(new Vector3D(0.5, 0.5, -0.5)))
 ];
 function setActive(name, isActive = true) {
     for (let i = 0; i < nonLinearFunctions.length; i++) {

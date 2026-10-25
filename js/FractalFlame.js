@@ -60,7 +60,8 @@ const points = [];
 for (let i = 0; i < POINT_COUNT; i++) {
     points.push({
         vector: /* is3d ? new Vector3D(0, 0, 0) : */ new Vector2D(0, 0),
-        color: new Color(0, 0, 0, 1)
+        color: new Color(0, 0, 0, 1),
+        timeUntouched: 0
     });
     resetPoint(points[i]);
 }
@@ -228,6 +229,7 @@ const PIXEL_CHUNK_SIZE = 4;
 const INIT_CYCLES = 20;
 const CYCLES_PER_FRAME = 1000;
 const POINTS_RESET_PER_FRAME = 10;
+let POINT_STALE_TIME = 1;
 for (let i = 0; i < canvas.height * canvas.width; i++) {
     histogram.push(new Color(0, 0, 0, 0));
 }
@@ -239,6 +241,12 @@ function animate() {
     for (let i = 0; i < CYCLES_PER_FRAME; i++) {
         for (let j = 0; j < points.length; j++) {
             const point = points[j];
+            if (point.timeUntouched >= POINT_STALE_TIME) {
+                point.timeUntouched = 0;
+                resetPoint(point);
+                console.log("point reset");
+                continue;
+            }
             const currFunction = choose(stepOpts, normalStepProbs);
             const currColor = stepColors.get(currFunction);
             point.vector = currFunction(point.vector);
@@ -252,10 +260,10 @@ function animate() {
                 histogramPixel.g += point.color.g;
                 histogramPixel.b += point.color.b;
                 histogramPixel.a += point.color.a;
-                // imageData.data[pixelChunk] = lerp(imageData.data[pixelChunk], point.color.r, alpha);
-                // imageData.data[pixelChunk + 1] = lerp(imageData.data[pixelChunk + 1], point.color.g, alpha);
-                // imageData.data[pixelChunk + 2] = lerp(imageData.data[pixelChunk + 2], point.color.b, alpha);
-                // imageData.data[pixelChunk + 3] = lerp(imageData.data[pixelChunk + 3], 255, alpha);
+                point.timeUntouched = 0;
+            }
+            else {
+                point.timeUntouched++;
             }
         }
     }

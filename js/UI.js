@@ -24,8 +24,13 @@ window.addEventListener("beforeunload", (event) => {
 const reactiveBox = document.getElementById("reactive");
 const matrixInput = document.getElementById("randomMatrices");
 const matrixWeightInput = document.getElementById("matrixWeight");
+const pixelResetTimeInput = document.getElementById("resetFrequency");
 matrixWeightInput.addEventListener("change", () => {
     matrixWeight = +matrixWeightInput.value;
+    syncWithUI();
+});
+pixelResetTimeInput.addEventListener("change", () => {
+    POINT_STALE_TIME = +pixelResetTimeInput.value;
     syncWithUI();
 });
 reactiveBox.addEventListener("change", syncWithUI);
