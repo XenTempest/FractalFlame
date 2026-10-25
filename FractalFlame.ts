@@ -268,7 +268,6 @@ function animate() {
                 if (point.timeUntouched >= pointStaleTime) {
                     point.timeUntouched = 0;
                     resetPoint(point);
-                    continue;
                 }
             }
         }
