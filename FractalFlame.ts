@@ -252,8 +252,8 @@ function animate() {
             point.color.incorporate(currColor);
             const screenPoint = toScreenSpace(point.vector);
 
-            if ((screenPoint.y < canvas.height && screenPoint.y > 0)
-                && (screenPoint.x < canvas.width && screenPoint.x > 0) && i > INIT_CYCLES) {
+            if ((screenPoint.y < canvas.height && screenPoint.y >= 0)
+                && (screenPoint.x < canvas.width && screenPoint.x >= 0) && i > INIT_CYCLES) {
                 const pixelIndex = screenPoint.x + canvas.width * screenPoint.y;
                 const histogramPixel = histogram[pixelIndex];
                 histogramPixel.r += point.color.r;
